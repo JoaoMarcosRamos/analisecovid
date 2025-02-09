@@ -58,6 +58,7 @@ class OmieConsultarCliente:
         self.call = "ConsultarCliente"
         self.codigo_cliente_omie = 0
         self.codigo_cliente_integracao = ""
+        self.registros_por_pagina = 500
 
     def executar(self):
         return OmieApi().executar(self, self.empresa) 
@@ -375,7 +376,6 @@ class OmieListarCategorias:
             registros = self.executar(console=console).get(nome_lista_omie, [])
             lista.extend(registros)
         return lista
-
 
 class OmieApi:
     def __init__(self, empresa = ""):

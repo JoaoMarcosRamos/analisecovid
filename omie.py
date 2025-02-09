@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 class Omie:
     def __init__(self, empresa):
         
+        self.ListarCategorias = OmieListarCategorias(empresa)
         self.AlterarPrecoItem = OmieAlterarPrecoItem(empresa)
         self.AlterarProduto = OmieAlterarProduto(empresa)
         self.ConsultarCliente = OmieConsultarCliente(empresa)
@@ -25,6 +26,8 @@ class Omie:
         self.ListarTabelasPreco = OmieListarTabelasPreco(empresa)
         self.ListarVendedores = OmieListarVendedores(empresa)
         self.ObterAnexo = OmieObterAnexo(empresa)
+
+
 
 class OmieAlterarPrecoItem:
     def __init__(self, empresa):
@@ -341,6 +344,38 @@ class OmieObterAnexo:
 
     def executar(self, console = False):
         return OmieApi().executar(self, self.empresa, console = console) 
+
+class OmieListarCategorias:
+    def __init__(self, empresa):
+        self.empresa = empresa
+        self.caminho = "geral/categorias/"
+        self.call = "ListarCategorias"
+        self.pagina = 1
+        self.registros_por_pagina = 500  # Default number of records per page
+
+    def executar(self, console=False):
+        """
+        Executes the API call using the OmieApi helper.
+        """
+        return OmieApi().executar(self, self.empresa, console=console)
+
+    def todos(self, console=False):
+        """
+        Retrieves all categorias by iterating through all pages.
+        Adjust the 'nome_lista_omie' key based on the actual JSON response.
+        """
+        nome_lista_omie = "categorias_cadastro"  # Change this if the API returns a different key
+        self.registros_por_pagina = 500  # Increase the number per page to minimize requests
+        consulta = self.executar(console=console)
+        total_de_paginas = consulta.get('total_de_paginas', 1)
+        lista = consulta.get(nome_lista_omie, [])
+
+        while self.pagina < total_de_paginas:
+            self.pagina += 1
+            registros = self.executar(console=console).get(nome_lista_omie, [])
+            lista.extend(registros)
+        return lista
+
 
 class OmieApi:
     def __init__(self, empresa = ""):
